@@ -7,7 +7,7 @@
 
 | | URL |
 |---|---|
-| 🚀 **Live Intelligence Database** | **https://aerolens-production.up.railway.app/data.html** |
+| 🚀 **Live Intelligence Database** | **https://mahin-aeroai.github.io/data.html** |
 | 🏠 **Landing Page** | **https://mahin-aeroai.github.io/AeroLens/** |
 | 💻 **GitHub Repo** | **https://github.com/mahin-aeroai/AeroLens** |
 
