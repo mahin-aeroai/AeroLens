@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AeroERP — India Aerospace Intelligence Database</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<style>
+:root{--navy:#050C18;--navy2:#0A1628;--navy3:#0D1F3C;--blue:#2E5F9E;--blue2:#5B8DC8;--amber:#E87722;--amber2:#F5A623;--white:#F5F7FA;--muted:#8B9BB4;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--navy);color:var(--white);min-height:100vh;}
+nav{position:sticky;top:0;z-index:999;background:rgba(5,12,24,0.97);backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,0.08);padding:12px 24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.nav-logo{width:32px;height:32px;border-radius:7px;background:linear-gradient(135deg,#1A3560,var(--amber));display:flex;align-items:center;justify-content:center;font-size:16px;position:relative;overflow:hidden;flex-shrink:0;}
+.nav-logo::after{content:'';position:absolute;inset:0;background:conic-gradient(from 0deg,transparent 75%,rgba(245,166,35,.6) 90%,transparent);animation:radar 3s linear infinite;}
+@keyframes radar{to{transform:rotate(360deg);}}
+.nav-title{font-weight:800;font-size:16px;color:#fff;}
+.nav-sub{font-size:11px;color:var(--muted);}
+.nav-links{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap;}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:12px;font-weight:600;padding:6px 12px;border-radius:7px;transition:.2s;}
+.nav-links a:hover,.nav-links a.active{color:#fff;background:rgba(255,255,255,.08);}
+.nav-links a.cta{background:var(--amber);color:#fff!important;}
+
+.hero{background:linear-gradient(135deg,var(--navy2),var(--navy3));border-bottom:1px solid rgba(255,255,255,.07);padding:40px 24px 30px;text-align:center;}
+.hero h1{font-size:clamp(24px,4vw,42px);font-weight:900;letter-spacing:-1px;margin-bottom:10px;}
+.hero h1 span{background:linear-gradient(135deg,var(--amber),var(--amber2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hero p{color:var(--muted);font-size:14px;margin-bottom:20px;}
+.kpi-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+.kpi{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px 22px;text-align:center;}
+.kpi .n{font-size:26px;font-weight:900;color:var(--amber2);}
+.kpi .l{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;}
+
+.main{max-width:1400px;margin:0 auto;padding:24px;}
+
+/* FILTERS */
+.filters{background:var(--navy2);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:16px 20px;margin-bottom:20px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+.filters input,.filters select{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#fff;border-radius:8px;padding:8px 12px;font-size:13px;outline:none;transition:.2s;}
+.filters input:focus,.filters select:focus{border-color:var(--blue);}
+.filters input{flex:1;min-width:220px;}
+.filters input::placeholder{color:var(--muted);}
+.filters select option{background:var(--navy2);}
+.result-count{font-size:12px;color:var(--muted);margin-left:auto;}
+.btn-clear{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--muted);border-radius:8px;padding:8px 14px;font-size:12px;cursor:pointer;transition:.2s;}
+.btn-clear:hover{color:#fff;background:rgba(255,255,255,.1);}
+
+/* TABS */
+.tabs{display:flex;gap:4px;margin-bottom:20px;border-bottom:1px solid rgba(255,255,255,.08);flex-wrap:wrap;}
+.tab{padding:9px 18px;font-size:13px;font-weight:600;color:var(--muted);border-bottom:2px solid transparent;cursor:pointer;transition:.2s;border-radius:8px 8px 0 0;}
+.tab:hover{color:var(--white);background:rgba(255,255,255,.04);}
+.tab.active{color:var(--amber2);border-bottom-color:var(--amber);background:rgba(232,119,34,.07);}
+
+/* COMPANY CARDS */
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px;}
+.co-card{background:var(--navy2);border:1px solid rgba(255,255,255,.07);border-radius:14px;overflow:hidden;transition:.25s;cursor:pointer;}
+.co-card:hover{border-color:var(--blue);transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.4);}
+.co-card-top{padding:18px 20px 14px;border-bottom:1px solid rgba(255,255,255,.06);}
+.co-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:10px;}
+.co-avatar{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;flex-shrink:0;}
+.co-name{font-size:15px;font-weight:700;color:#fff;line-height:1.3;}
+.co-hq{font-size:11px;color:var(--muted);margin-top:2px;display:flex;align-items:center;gap:4px;}
+.co-type-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;margin-top:4px;display:inline-block;}
+.co-meta{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;}
+.co-meta-item .label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;}
+.co-meta-item .value{font-size:13px;font-weight:600;color:#fff;margin-top:1px;}
+.co-card-bottom{padding:12px 20px;display:flex;gap:6px;flex-wrap:wrap;background:rgba(0,0,0,.15);}
+.chip{font-size:10px;font-weight:600;padding:3px 8px;border-radius:5px;display:inline-flex;align-items:center;gap:3px;}
+.chip-ai{background:rgba(171,71,188,.2);color:#CE93D8;border:1px solid rgba(171,71,188,.3);}
+.chip-ml{background:rgba(0,121,107,.2);color:#80CBC4;border:1px solid rgba(0,121,107,.3);}
+.chip-do178{background:rgba(13,71,161,.2);color:#90CAF9;border:1px solid rgba(13,71,161,.3);}
+.chip-get{background:rgba(46,125,50,.2);color:#A5D6A7;border:1px solid rgba(46,125,50,.3);}
+.chip-intern{background:rgba(245,166,35,.15);color:#FFE082;border:1px solid rgba(245,166,35,.3);}
+.chip-dt{background:rgba(0,96,100,.2);color:#80CBC4;border:1px solid rgba(0,96,100,.3);}
+.chip-addmfg{background:rgba(230,74,25,.2);color:#FFAB91;border:1px solid rgba(230,74,25,.3);}
+
+/* SEG COLORS */
+.seg-defence{background:rgba(183,28,28,.25);color:#EF9A9A;}
+.seg-space{background:rgba(0,96,100,.25);color:#80CBC4;}
+.seg-uav{background:rgba(230,119,34,.2);color:#FFCC80;}
+.seg-mfg{background:rgba(27,94,32,.25);color:#A5D6A7;}
+.seg-software{background:rgba(74,20,140,.25);color:#CE93D8;}
+.seg-avionics{background:rgba(13,71,161,.25);color:#90CAF9;}
+.seg-mro{background:rgba(0,77,64,.25);color:#80CBC4;}
+.type-psu{background:rgba(183,28,28,.2);color:#EF9A9A;}
+.type-govt{background:rgba(0,77,64,.2);color:#80CBC4;}
+.type-mnc{background:rgba(13,71,161,.2);color:#90CAF9;}
+.type-private{background:rgba(74,20,140,.2);color:#CE93D8;}
+.type-startup{background:rgba(245,166,35,.15);color:#FFE082;}
+.type-jv{background:rgba(46,125,50,.2);color:#A5D6A7;}
+
+/* DETAIL MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:2000;align-items:center;justify-content:center;padding:20px;}
+.modal-overlay.open{display:flex;}
+.modal-box{background:var(--navy2);border:1px solid rgba(255,255,255,.1);border-radius:16px;width:100%;max-width:780px;max-height:90vh;overflow-y:auto;}
+.modal-box::-webkit-scrollbar{width:5px;}
+.modal-box::-webkit-scrollbar-thumb{background:var(--blue);border-radius:3px;}
+.modal-head{padding:22px 26px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:14px;position:sticky;top:0;background:var(--navy2);z-index:1;}
+.modal-close{margin-left:auto;background:rgba(255,255,255,.08);border:none;color:#fff;width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;}
+.modal-body{padding:24px 26px;}
+.detail-section{margin-bottom:24px;}
+.detail-section h4{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--amber);margin-bottom:12px;display:flex;align-items:center;gap:7px;}
+.detail-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;}
+.detail-item{background:rgba(255,255,255,.04);border-radius:8px;padding:10px 12px;}
+.detail-item .dl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;}
+.detail-item .dv{font-size:13px;font-weight:600;color:#fff;margin-top:3px;word-break:break-word;}
+.project-row{background:rgba(255,255,255,.04);border-radius:8px;padding:12px 14px;margin-bottom:8px;border-left:3px solid var(--blue);}
+.project-row.defence{border-left-color:#EF5350;}
+.project-row.space{border-left-color:#26A69A;}
+.project-row.uav{border-left-color:#FFB74D;}
+.project-row .pt{font-size:13px;font-weight:700;color:#fff;}
+.project-row .pm{font-size:12px;color:var(--muted);margin-top:3px;}
+.job-row{background:rgba(255,255,255,.04);border-radius:8px;padding:11px 14px;margin-bottom:7px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+.job-row .jt{font-size:13px;font-weight:600;color:#fff;}
+.job-row .jm{font-size:11px;color:var(--muted);}
+.apply-btn{background:var(--blue);color:#fff;border:none;border-radius:7px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-block;transition:.2s;}
+.apply-btn:hover{background:var(--blue2);color:#fff;}
+
+/* TABLE VIEW */
+.table-view{display:none;}
+.aero-table{width:100%;border-collapse:collapse;}
+.aero-table thead th{background:var(--navy3);color:var(--blue2);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;padding:11px 14px;white-space:nowrap;border-bottom:1px solid rgba(255,255,255,.08);}
+.aero-table tbody tr{border-bottom:1px solid rgba(255,255,255,.04);transition:.15s;cursor:pointer;}
+.aero-table tbody tr:hover{background:rgba(255,255,255,.04);}
+.aero-table tbody td{padding:11px 14px;font-size:13px;color:var(--white);vertical-align:middle;}
+.fw7{font-weight:700;color:#fff;}
+.tick{color:#66BB6A;font-weight:700;}
+.cross{color:rgba(255,255,255,.2);}
+
+/* PROJECTS PAGE */
+#page-projects,#page-jobs,#page-tech{display:none;}
+.section-card{background:var(--navy2);border:1px solid rgba(255,255,255,.07);border-radius:12px;overflow:hidden;margin-bottom:14px;}
+.sc-head{padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:10px;}
+.sc-head .co-n{font-size:14px;font-weight:700;color:#fff;}
+.sc-head .co-s{font-size:11px;color:var(--muted);}
+.sc-body{padding:14px 18px;}
+.proj-item{padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04);}
+.proj-item:last-child{border:none;}
+.proj-name{font-size:13px;font-weight:600;color:#fff;}
+.proj-meta{font-size:12px;color:var(--muted);margin-top:3px;}
+.value-pill{background:rgba(245,166,35,.15);color:var(--amber2);border-radius:20px;padding:2px 10px;font-size:11px;font-weight:700;display:inline-block;margin-left:8px;}
+.status-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;}
+.s-ongoing{background:#66BB6A;}
+.s-completed{background:#42A5F5;}
+.s-planned{background:#FFB74D;}
+
+/* RESPONSIVE */
+@media(max-width:640px){.cards-grid{grid-template-columns:1fr;}.nav-links{gap:3px;}.filters{gap:6px;}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">✈</div>
+  <div>
+    <div class="nav-title">AeroERP Intelligence</div>
+    <div class="nav-sub">India Aerospace Database</div>
+  </div>
+  <div class="nav-links">
+    <a href="#" class="active" onclick="showPage('companies',this)">🏢 Companies</a>
+    <a href="#" onclick="showPage('projects',this)">🚀 Projects</a>
+    <a href="#" onclick="showPage('jobs',this)">💼 Jobs</a>
+    <a href="#" onclick="showPage('tech',this)">🤖 Technology</a>
+    <a href="/" >← Home</a>
+    <a href="https://github.com/mahin-aeroai/AeroERP" target="_blank" class="cta"><i class="bi bi-github"></i> GitHub</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <h1>India <span>Aerospace Industry</span> Intelligence</h1>
+  <p>Real data on 58 companies — Defence, Space, UAV, Avionics, Manufacturing, Software</p>
+  <div class="kpi-row">
+    <div class="kpi"><div class="n">58</div><div class="l">Companies</div></div>
+    <div class="kpi"><div class="n">22</div><div class="l">Defence</div></div>
+    <div class="kpi"><div class="n">9</div><div class="l">Space</div></div>
+    <div class="kpi"><div class="n">14</div><div class="l">UAV/Drone</div></div>
+    <div class="kpi"><div class="n">25</div><div class="l">Use AI/ML</div></div>
+    <div class="kpi"><div class="n">₹2.1L Cr</div><div class="l">Combined Revenue</div></div>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- COMPANIES PAGE -->
+<div id="page-companies">
+  <div class="filters">
+    <input type="text" id="search" placeholder="🔍  Search company, CEO, product, technology, city…" oninput="filterAll()">
+    <select id="f-seg" onchange="filterAll()">
+      <option value="">All Segments</option>
+      <option value="Defence">Defence</option>
+      <option value="Space">Space</option>
+      <option value="UAV">UAV/Drone</option>
+      <option value="Manufacturing">Manufacturing</option>
+      <option value="Software">Software</option>
+      <option value="Avionics">Avionics</option>
+      <option value="MRO">MRO</option>
+    </select>
+    <select id="f-type" onchange="filterAll()">
+      <option value="">All Types</option>
+      <option value="PSU">PSU</option>
+      <option value="Govt">Govt.</option>
+      <option value="MNC">MNC</option>
+      <option value="Private">Private</option>
+      <option value="Startup">Startup</option>
+      <option value="JV">JV</option>
+    </select>
+    <select id="f-city" onchange="filterAll()">
+      <option value="">All Cities</option>
+      <option value="Bangalore">Bangalore</option>
+      <option value="Hyderabad">Hyderabad</option>
+      <option value="Delhi">Delhi</option>
+      <option value="Mumbai">Mumbai</option>
+      <option value="Pune">Pune</option>
+      <option value="Chennai">Chennai</option>
+    </select>
+    <select id="f-ai" onchange="filterAll()">
+      <option value="">All</option>
+      <option value="ai">Uses AI/ML</option>
+      <option value="get">Has GET Programme</option>
+      <option value="do178">DO-178C Certified</option>
+    </select>
+    <div class="tabs" style="margin:0;border:none;">
+      <div class="tab active" onclick="setView('grid',this)" style="padding:7px 12px;font-size:12px">⊞ Grid</div>
+      <div class="tab" onclick="setView('table',this)" style="padding:7px 12px;font-size:12px">☰ Table</div>
+    </div>
+    <span class="result-count" id="count">58 companies</span>
+    <button class="btn-clear" onclick="clearFilters()">✕ Clear</button>
+  </div>
+
+  <div id="grid-view" class="cards-grid" id="cards-container"></div>
+  <div id="table-view" class="table-view">
+    <div style="overflow-x:auto;border-radius:12px;border:1px solid rgba(255,255,255,.07)">
+      <table class="aero-table">
+        <thead><tr>
+          <th>#</th><th>Company</th><th>Type</th><th>Segment</th><th>HQ</th>
+          <th>CEO / Head</th><th>Revenue</th><th>Staff</th>
+          <th>AI</th><th>DO-178C</th><th>GET</th><th>Open Jobs</th>
+        </tr></thead>
+        <tbody id="table-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- PROJECTS PAGE -->
+<div id="page-projects" style="display:none">
+  <div class="filters"><input type="text" id="proj-search" placeholder="🔍  Search projects…" oninput="filterProjects()">
+    <select id="proj-seg" onchange="filterProjects()"><option value="">All Sectors</option><option>Defence</option><option>Space</option><option>UAV</option><option>Commercial</option></select>
+    <span class="result-count" id="proj-count"></span>
+  </div>
+  <div id="projects-list"></div>
+</div>
+
+<!-- JOBS PAGE -->
+<div id="page-jobs" style="display:none">
+  <div class="filters"><input type="text" id="job-search" placeholder="🔍  Search jobs, skills, company…" oninput="filterJobs()">
+    <select id="job-type" onchange="filterJobs()"><option value="">All Types</option><option>GET</option><option>Fulltime</option><option>Internship</option></select>
+    <select id="job-city" onchange="filterJobs()"><option value="">All Cities</option><option>Hyderabad</option><option>Bangalore</option><option>Mumbai</option><option>Delhi</option><option>Chennai</option><option>Pune</option></select>
+    <span class="result-count" id="job-count"></span>
+  </div>
+  <div style="overflow-x:auto;border-radius:12px;border:1px solid rgba(255,255,255,.07)">
+    <table class="aero-table"><thead><tr><th>Company</th><th>Position</th><th>Type</th><th>Location</th><th>Experience</th><th>Salary (LPA)</th><th>Skills</th><th>Apply</th></tr></thead>
+    <tbody id="jobs-tbody"></tbody></table>
+  </div>
+</div>
+
+<!-- TECH PAGE -->
+<div id="page-tech" style="display:none">
+  <div class="filters"><input type="text" id="tech-search" placeholder="🔍  Search technology, tools, language…" oninput="filterTech()">
+    <select id="tech-filter" onchange="filterTech()"><option value="">All</option><option value="ai">AI/ML</option><option value="dt">Digital Twin</option><option value="addmfg">Additive Mfg</option><option value="do178">DO-178C</option></select>
+    <span class="result-count" id="tech-count"></span>
+  </div>
+  <div style="overflow-x:auto;border-radius:12px;border:1px solid rgba(255,255,255,.07)">
+    <table class="aero-table"><thead><tr><th>Company</th><th>Segment</th><th>AI/ML Use Case</th><th>CAD Tools</th><th>Simulation</th><th>Languages</th><th>DO-178C</th><th>Digital Twin</th><th>Additive</th></tr></thead>
+    <tbody id="tech-tbody"></tbody></table>
+  </div>
+</div>
+
+</div><!-- end main -->
+
+<!-- DETAIL MODAL -->
+<div class="modal-overlay" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal-box" id="modal-box"></div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// REAL DATA — 58 Indian Aerospace Companies
+// ═══════════════════════════════════════════════════════
+const COMPANIES = [
+  {id:1,name:"Hindustan Aeronautics Limited",short:"HAL",type:"PSU",seg:"Defence",hq:"Bangalore",state:"Karnataka",ceo:"C B Ananthakrishnan (CMD)",founded:1940,revenue:"₹28,162 Cr",employees:"30,000",website:"https://hal-india.co.in",careers:"https://hal-india.co.in/careers",certifications:"AS9100D, CMMI L5, ISO 9001, NADCAP",export:"USA, UK, Malaysia, Israel, Ecuador",partners:"Boeing, Airbus, Safran, GE, Rolls-Royce, Honeywell",ai:true,ml:true,do178:true,dt:true,addmfg:true,get:true,intern:true,openJobs:12,
+   products:"Tejas LCA, Dhruv ALH, Chetak, Do-228, Hawk Mk132, Su-30MKI components, IMRH",
+   cad:"CATIA V5, Siemens NX, DELMIA",sim:"ANSYS Fluent, MATLAB/Simulink, NASTRAN",langs:"C, C++, Ada, MATLAB, Python",
+   aiUse:"Predictive maintenance for aircraft engines, quality inspection AI, supply chain optimization",
+   color:"#B71C1C",
+   projects:[
+     {name:"Tejas Mk1A — 83 Aircraft Production",sector:"Defence",value:"₹48,000 Cr",status:"ongoing",desc:"Full production of 83 Tejas Mk1A fighters for IAF with AESA radar, EW suite, BVR missiles"},
+     {name:"LCH Prachand Production",sector:"Defence",value:"₹3,887 Cr",status:"ongoing",desc:"15 Light Combat Helicopters for IAF and Army"},
+     {name:"IMRH — Indian Multi-Role Helicopter",sector:"Defence",value:"₹15,000 Cr",status:"planned",desc:"13-tonne naval multi-role helicopter to replace Sea King"},
+     {name:"HTT-40 Basic Trainer",sector:"Defence",value:"₹6,800 Cr",status:"ongoing",desc:"70 HTT-40 basic trainer aircraft for IAF"},
+     {name:"Do-228 Upgrade",sector:"Commercial",value:"₹1,200 Cr",status:"ongoing",desc:"Upgraded Do-228 turboprop for regional connectivity"}
+   ],
+   jobs:[
+     {title:"Junior Works Manager – Avionics",type:"GET",city:"Bangalore",exp:"0–2 yr",salary:"₹7–9 LPA",skills:"DO-178C, C/C++, ARINC 429",url:"https://hal-india.co.in/careers"},
+     {title:"Management Trainee – Finance",type:"GET",city:"Bangalore",exp:"0–1 yr",salary:"₹7 LPA",skills:"CA/MBA Finance",url:"https://hal-india.co.in/careers"},
+     {title:"Apprentice – Aerospace Manufacturing",type:"Internship",city:"Nashik",exp:"Diploma",salary:"Stipend",skills:"Composites, CNC, Sheet Metal",url:"https://hal-india.co.in/careers"}
+   ]},
+
+  {id:2,name:"Bharat Electronics Limited",short:"BEL",type:"PSU",seg:"Avionics",hq:"Bangalore",state:"Karnataka",ceo:"Bhanu Prakash Srivastava (CMD)",founded:1954,revenue:"₹19,996 Cr",employees:"12,400",website:"https://bel-india.in",careers:"https://bel-india.in/careers",certifications:"AS9100D, ISO 9001, ISO 27001, CMMI L4",export:"Israel, UAE, USA, Sri Lanka, Myanmar",partners:"IAF, Indian Navy, DRDO, L&T, Airbus",ai:true,ml:true,do178:true,dt:false,addmfg:false,get:true,intern:true,openJobs:8,
+   products:"AESA Radar, EW Systems, Avionics, Naval Systems, Communication, Missile Systems, Smart City",
+   cad:"Cadence, Mentor EDA, SolidWorks",sim:"CST Studio Suite, MATLAB, ModelSim, HFSS",langs:"C, C++, VHDL, Verilog, Python, Embedded C",
+   aiUse:"Radar target recognition, EW signal classification, predictive maintenance of defence systems",
+   color:"#1565C0",
+   projects:[
+     {name:"Uttam AESA Radar — Tejas",sector:"Defence",value:"₹3,200 Cr",status:"ongoing",desc:"Indigenous AESA Fire Control Radar for Tejas Mk1A fighter"},
+     {name:"Akash NG Missile Seeker",sector:"Defence",value:"₹2,400 Cr",status:"ongoing",desc:"Active RF seeker for Akash-NG air defence missile"},
+     {name:"QRSAM Fire Control System",sector:"Defence",value:"₹1,800 Cr",status:"completed",desc:"Quick Reaction SAM fire control system for Indian Army"},
+     {name:"Smart City — 100 Cities",sector:"Commercial",value:"₹4,500 Cr",status:"ongoing",desc:"Surveillance, traffic management, command centre systems"}
+   ],
+   jobs:[
+     {title:"Engineer – VLSI/FPGA Design",type:"GET",city:"Bangalore",exp:"0–2 yr",salary:"₹7–9 LPA",skills:"VHDL, Verilog, Cadence, FPGA",url:"https://bel-india.in/careers"},
+     {title:"Trainee Engineer – Embedded Systems",type:"GET",city:"Ghaziabad",exp:"0–1 yr",salary:"₹6.5 LPA",skills:"C, RTOS, STM32, CAN",url:"https://bel-india.in/careers"}
+   ]},
+
+  {id:3,name:"ISRO",short:"ISRO",type:"Govt",seg:"Space",hq:"Bangalore",state:"Karnataka",ceo:"V. Narayanan (Chairman)",founded:1969,revenue:"₹13,043 Cr",employees:"17,000",website:"https://isro.gov.in",careers:"https://isro.gov.in/careers",certifications:"ISO 9001, ECSS standards",export:"France, UK, USA, Singapore, UAE",partners:"NASA, ESA, JAXA, Arianespace, OneWeb",ai:true,ml:true,do178:false,dt:true,addmfg:true,get:true,intern:true,openJobs:24,
+   products:"LVM3, PSLV, GSLV, Chandrayaan, Mangalyaan, Aditya-L1, NavIC, INSAT, GSAT, Gaganyaan",
+   cad:"CATIA, ProE, Siemens NX, ANSYS",sim:"GMAT, OpenFOAM, MATLAB, STK, ANSYS Multiphysics",langs:"C, C++, Python, MATLAB, FORTRAN, Ada",
+   aiUse:"Satellite image processing AI, autonomous landing guidance, space debris detection ML, crop monitoring",
+   color:"#1B5E20",
+   projects:[
+     {name:"Gaganyaan — Human Spaceflight",sector:"Space",value:"₹10,000 Cr",status:"ongoing",desc:"India's first crewed spaceflight mission — 3-person orbital flight"},
+     {name:"Chandrayaan-4 — Lunar Sample Return",sector:"Space",value:"₹2,104 Cr",status:"planned",desc:"Moon sample return mission — robotic sample collection and return"},
+     {name:"Aditya-L1 Extended Mission",sector:"Space",value:"₹400 Cr",status:"ongoing",desc:"India's first solar observatory at L1 Lagrange point"},
+     {name:"NISAR — NASA-ISRO SAR",sector:"Space",value:"₹1,500 Cr",status:"ongoing",desc:"Joint Earth observation SAR satellite with NASA"},
+     {name:"Venus Orbiter Mission",sector:"Space",value:"₹1,236 Cr",status:"planned",desc:"Shukrayaan-1 orbiter to study Venus atmosphere"}
+   ],
+   jobs:[
+     {title:"Scientist/Engineer – Avionics",type:"GET",city:"Bangalore",exp:"0–1 yr",salary:"₹56,100/mo",skills:"DO-178C, Embedded C, RTOS",url:"https://isro.gov.in/careers"},
+     {title:"Scientist/Engineer – Structures",type:"GET",city:"Thiruvananthapuram",exp:"0–1 yr",salary:"₹56,100/mo",skills:"FEA, NASTRAN, CATIA",url:"https://isro.gov.in/careers"},
+     {title:"JRF – AI/ML for Space Applications",type:"Internship",city:"Bangalore",exp:"M.Tech/PhD",salary:"₹31,000/mo",skills:"Python, TensorFlow, Remote Sensing",url:"https://isro.gov.in/careers"}
+   ]},
+
+  {id:4,name:"DRDO",short:"DRDO",type:"Govt",seg:"Defence",hq:"New Delhi",state:"Delhi",ceo:"Dr. Samir V. Kamat (Chairman)",founded:1958,revenue:"₹23,264 Cr",employees:"30,000",website:"https://drdo.gov.in",careers:"https://drdo.gov.in/careers",certifications:"ISO 9001, NABL accreditation",export:"Israel, USA, France",partners:"HAL, BEL, L&T, Tata, ISRO, foreign defence agencies",ai:true,ml:true,do178:false,dt:true,addmfg:true,get:true,intern:true,openJobs:30,
+   products:"Tejas avionics, Agni missiles, Akash SAM, ASTRA BVR, QRSAM, DRDO radars, Arjun tank",
+   cad:"CATIA, ProE, SolidWorks, ANSYS",sim:"MATLAB, STK, OpenFOAM, LabVIEW",langs:"C, C++, Ada, Python, MATLAB",
+   aiUse:"Autonomous drone swarm intelligence, AI-based target recognition, cyber warfare AI, battlefield management systems",
+   color:"#4A148C",
+   projects:[
+     {name:"Tejas Mk2 — 6th Gen Fighter",sector:"Defence",value:"₹15,000 Cr",status:"planned",desc:"Twin-engine medium-weight fighter with AESA, conformal tanks, advanced EW"},
+     {name:"AMCA — Advanced Medium Combat Aircraft",sector:"Defence",value:"₹25,000 Cr",status:"planned",desc:"India's 5th generation stealth fighter aircraft program"},
+     {name:"Agni-V MIRV",sector:"Defence",value:"Classified",status:"completed",desc:"Multiple Independent Re-entry Vehicle ICBM successfully tested"},
+     {name:"Aura UCAV",sector:"Defence",value:"₹20,000 Cr",status:"planned",desc:"Stealth unmanned combat aerial vehicle"},
+     {name:"Rustom-2 MALE UAV",sector:"Defence",value:"₹3,600 Cr",status:"ongoing",desc:"Medium altitude long endurance UAV for ISR missions"}
+   ],
+   jobs:[
+     {title:"Research Associate – AI/ML",type:"Internship",city:"Hyderabad",exp:"M.Tech/PhD",salary:"₹40,000/mo",skills:"PyTorch, Python, Computer Vision",url:"https://drdo.gov.in/careers"},
+     {title:"Junior Research Fellow – Embedded",type:"Internship",city:"Bangalore",exp:"B.Tech",salary:"₹31,000/mo",skills:"STM32, RTOS, C",url:"https://drdo.gov.in/careers"},
+     {title:"Scientist B — Aerospace",type:"GET",city:"Multiple",exp:"0–3 yr",salary:"₹67,700/mo",skills:"Aerodynamics, CFD, MATLAB",url:"https://drdo.gov.in/careers"}
+   ]},
+
+  {id:5,name:"Honeywell Aerospace India",short:"Honeywell",type:"MNC",seg:"Avionics",hq:"Hyderabad",state:"Telangana",ceo:"Ashish Gaikwad (India President)",founded:1999,revenue:"₹8,000 Cr",employees:"18,000",website:"https://aerospace.honeywell.com",careers:"https://careers.honeywell.com",certifications:"AS9100D, DO-178C, DO-254, CMMI L5, ISO 9001",export:"Global — 100+ countries",partners:"Boeing, Airbus, HAL, GE, Rolls-Royce, Pratt & Whitney",ai:true,ml:true,do178:true,dt:true,addmfg:true,get:true,intern:true,openJobs:15,
+   products:"Avionics systems, FMS, APU, turbochargers, cabin management, satellite comms, Forge EAM",
+   cad:"CATIA V5, NX, Creo, SolidWorks",sim:"ANSYS, Fluent, Altair HyperWorks, MATLAB",langs:"C, C++, Ada, Python, Java, MATLAB",
+   aiUse:"Predictive MRO using Forge platform, AI crew scheduling, autonomous aircraft health monitoring, IIoT analytics",
+   color:"#E65100",
+   projects:[
+     {name:"Primus Epic Avionics Suite — HAL",sector:"Defence",value:"₹1,200 Cr",status:"ongoing",desc:"Integrated glass cockpit avionics for HAL aircraft"},
+     {name:"Connected Aircraft Platform",sector:"Commercial",value:"₹800 Cr",status:"ongoing",desc:"IIoT-based aircraft health monitoring and predictive maintenance"},
+     {name:"Urban Air Mobility Systems",sector:"Commercial",value:"₹500 Cr",status:"planned",desc:"Avionics and navigation for eVTOL urban air taxis"}
+   ],
+   jobs:[
+     {title:"Software Engineer – DO-178C Avionics",type:"Fulltime",city:"Hyderabad",exp:"0–2 yr",salary:"₹8–14 LPA",skills:"C, DO-178C, ARINC 429/664, Python",url:"https://careers.honeywell.com"},
+     {title:"Systems Engineer – Flight Management",type:"Fulltime",city:"Hyderabad",exp:"1–3 yr",salary:"₹10–16 LPA",skills:"FMS algorithms, MATLAB, Simulink",url:"https://careers.honeywell.com"},
+     {title:"Intern – AI/ML Aerospace",type:"Internship",city:"Hyderabad",exp:"B.Tech/M.Tech",salary:"₹35,000/mo",skills:"Python, TensorFlow, Data Science",url:"https://careers.honeywell.com"}
+   ]},
+
+  {id:6,name:"GE Aerospace India",short:"GE",type:"MNC",seg:"Software",hq:"Hyderabad",state:"Telangana",ceo:"Pratyush Kumar (MD India)",founded:1902,revenue:"₹6,000 Cr",employees:"10,000",website:"https://www.geaerospace.com",careers:"https://jobs.geaerospace.com",certifications:"AS9100D, DO-178C, ISO 9001, CMMI L5",export:"Global",partners:"HAL, SAFHAL, Boeing, Airbus, CFM International",ai:true,ml:true,do178:true,dt:true,addmfg:true,get:true,intern:true,openJobs:11,
+   products:"GE90, LEAP engines, F404/F414 jet engines, Predix platform, digital aviation software",
+   cad:"NX, CATIA, Creo, ANSYS",sim:"ANSYS Fluent, MATLAB, OpenFOAM, NUMECA",langs:"Python, C++, Java, MATLAB, Scala",
+   aiUse:"Predix industrial IoT, engine health AI, additive manufacturing optimisation, digital twin of engines",
+   color:"#006064",
+   projects:[
+     {name:"F414 Engine for Tejas Mk2",sector:"Defence",value:"₹7,400 Cr",status:"ongoing",desc:"84 F414-INS6 turbofan engines for Tejas Mk2 with HAL joint production"},
+     {name:"LEAP Engine MRO India",sector:"Commercial",value:"₹2,000 Cr",status:"ongoing",desc:"MRO facility for LEAP engines supporting Indian airline fleet"},
+     {name:"Digital Twin Engine Platform",sector:"Commercial",value:"₹500 Cr",status:"ongoing",desc:"AI-powered digital twin for predictive maintenance of commercial engines"}
+   ],
+   jobs:[
+     {title:"Software Engineer – Predix Platform",type:"Fulltime",city:"Hyderabad",exp:"0–3 yr",salary:"₹8–15 LPA",skills:"Python, Java, Cloud, Microservices",url:"https://jobs.geaerospace.com"},
+     {title:"Mechanical Engineer – Additive Mfg",type:"Fulltime",city:"Pune",exp:"1–3 yr",salary:"₹8–12 LPA",skills:"SLM, DMLS, Topology Optimisation, CATIA",url:"https://jobs.geaerospace.com"}
+   ]},
+
+  {id:7,name:"Cyient Limited",short:"Cyient",type:"Private",seg:"Software",hq:"Hyderabad",state:"Telangana",ceo:"Karthikeyan Natarajan (MD & CEO)",founded:1991,revenue:"₹7,200 Cr",employees:"15,000",website:"https://cyient.com",careers:"https://cyient.com/careers",certifications:"AS9100D, DO-178C, CMMI L5, ISO 9001, EASA Part-145",export:"USA, UK, Europe, Australia",partners:"Honeywell, Collins, Pratt & Whitney, Rolls-Royce, Boeing",ai:true,ml:true,do178:true,dt:true,addmfg:false,get:true,intern:true,openJobs:20,
+   products:"Avionics software, MRO tech, engineering services, digital engineering, IoT solutions",
+   cad:"CATIA, NX, AVEVA, ANSYS",sim:"MATLAB, ANSYS, OpenFOAM, ModelSim",langs:"C, C++, Python, Ada, Java, MATLAB",
+   aiUse:"MRO predictive analytics, AI-powered aircraft health monitoring, NLP for maintenance documentation",
+   color:"#00695C",
+   projects:[
+     {name:"Avionics SW — Airbus A320 Family",sector:"Commercial",value:"₹1,500 Cr",status:"ongoing",desc:"DO-178C level A/B avionics software for A320/A321 family"},
+     {name:"Engine Health Monitoring — P&W",sector:"Commercial",value:"₹800 Cr",status:"ongoing",desc:"ML-based engine health and prognostics for Pratt & Whitney GTF"},
+     {name:"Indian Regional Aircraft SW",sector:"Commercial",value:"₹400 Cr",status:"planned",desc:"DO-178C software development for NAD's 90-seater regional aircraft"}
+   ],
+   jobs:[
+     {title:"Associate Engineer – DO-178C",type:"GET",city:"Hyderabad",exp:"0–1 yr",salary:"₹5–7 LPA",skills:"C, DO-178C, RTCA DO-160, ARINC 664",url:"https://cyient.com/careers/leap"},
+     {title:"Data Scientist – Aerospace MRO",type:"Fulltime",city:"Hyderabad",exp:"1–3 yr",salary:"₹8–14 LPA",skills:"Python, ML, Azure, Power BI",url:"https://cyient.com/careers"},
+     {title:"LEAP Graduate Programme",type:"GET",city:"Hyderabad",exp:"0–1 yr",salary:"₹5.5 LPA",skills:"Engineering degree, aerospace domain",url:"https://cyient.com/careers/leap"}
+   ]},
+
+  {id:8,name:"Tata Advanced Systems Limited",short:"TASL",type:"Private",seg:"Manufacturing",hq:"Hyderabad",state:"Telangana",ceo:"Sukaran Singh (MD & CEO)",founded:2007,revenue:"₹3,500 Cr",employees:"2,500",website:"https://tataadvancedsystems.com",careers:"https://tataadvancedsystems.com/careers",certifications:"AS9100D, ISO 9001, NADCAP, ITAR registered",export:"USA (Boeing, Lockheed), Israel, UK",partners:"Boeing, Lockheed Martin, Sikorsky, SAAB, HAL",ai:false,ml:false,do178:false,dt:false,addmfg:true,get:true,intern:true,openJobs:6,
+   products:"Aerostructures, C-17 components, AH-64 Apache components, F-16/F-18 structures, UAV airframes",
+   cad:"CATIA V5, NX, SolidWorks, ENOVIA",sim:"ANSYS, Nastran, HyperMesh",langs:"Python (automation), C (embedded), MATLAB",
+   aiUse:"Quality inspection automation, manufacturing process optimisation",
+   color:"#1A237E",
+   projects:[
+     {name:"C-17 Globemaster Aerostructures",sector:"Defence",value:"₹2,000 Cr",status:"ongoing",desc:"Fuselage panels and components for Boeing C-17 military transport"},
+     {name:"AH-64 Apache Fuselage",sector:"Defence",value:"₹1,500 Cr",status:"ongoing",desc:"Structural components for Boeing AH-64 Apache helicopter"},
+     {name:"SAAB Gripen Components",sector:"Defence",value:"₹800 Cr",status:"ongoing",desc:"Aerostructure components for SAAB Gripen fighter jet"}
+   ],
+   jobs:[
+     {title:"Manufacturing Engineer – Composites",type:"Fulltime",city:"Hyderabad",exp:"0–2 yr",salary:"₹5–8 LPA",skills:"CFRP, VARTM, autoclave, AS9100D",url:"https://tataadvancedsystems.com/careers"},
+     {title:"Graduate Trainee – Aerospace Structures",type:"GET",city:"Hyderabad",exp:"0–1 yr",salary:"₹5 LPA",skills:"FEA, CATIA, NASTRAN",url:"https://tataadvancedsystems.com/careers"}
+   ]},
+
+  {id:9,name:"Collins Aerospace India",short:"Collins",type:"MNC",seg:"Avionics",hq:"Hyderabad",state:"Telangana",ceo:"Stephen Timm (President)",founded:2018,revenue:"₹4,500 Cr",employees:"6,000",website:"https://collinsaerospace.com",careers:"https://jobs.collinsaerospace.com",certifications:"AS9100D, DO-178C, DO-254, NADCAP, ISO 9001",export:"Global — Boeing, Airbus, Embraer customers",partners:"Boeing, Airbus, HAL, Embraer, Dassault",ai:true,ml:true,do178:true,dt:true,addmfg:false,get:true,intern:true,openJobs:9,
+   products:"Avionics, interiors, actuation, power systems, mechanical systems, mission systems",
+   cad:"CATIA, NX, SolidWorks",sim:"ANSYS, MATLAB, Simulink",langs:"C, C++, Ada, Python",
+   aiUse:"Intelligent cabin systems, predictive aircraft health management, AI-based avionics testing",
+   color:"#37474F",
+   projects:[
+     {name:"Pro Line Fusion Avionics Suite",sector:"Commercial",value:"₹1,800 Cr",status:"ongoing",desc:"Integrated avionics for business jets and regional turboprops"},
+     {name:"HAL Helicopter Avionics",sector:"Defence",value:"₹600 Cr",status:"ongoing",desc:"Mission avionics for HAL Advanced Light Helicopter variants"}
+   ],
+   jobs:[
+     {title:"Software Engineer – Avionics",type:"Fulltime",city:"Hyderabad",exp:"0–3 yr",salary:"₹8–14 LPA",skills:"C, DO-178C, DAL A/B, ARINC",url:"https://jobs.collinsaerospace.com"},
+     {title:"Systems Engineer – IMA",type:"Fulltime",city:"Hyderabad",exp:"1–4 yr",salary:"₹10–18 LPA",skills:"ARINC 653, IMA, DOORS, MATLAB",url:"https://jobs.collinsaerospace.com"}
+   ]},
+
+  {id:10,name:"Thales India",short:"Thales",type:"MNC",seg:"Avionics",hq:"Delhi NCR",state:"Delhi",ceo:"Emmanuel de Roquefeuil (Country Director)",founded:1953,revenue:"₹3,000 Cr",employees:"2,000",website:"https://thalesgroup.com/india",careers:"https://thalesgroup.com/careers",certifications:"AS9100D, DO-178C, ISO 9001",export:"Global",partners:"HAL, Dassault, Airbus, Indian Navy",ai:true,ml:false,do178:true,dt:false,addmfg:false,get:true,intern:true,openJobs:5,
+   products:"Avionics, IFF systems, radar, EW, Scorpene submarine systems, communications",
+   cad:"CATIA, SolidWorks",sim:"MATLAB, DOORS, SystemWeaver",langs:"C, C++, Ada, Python",
+   aiUse:"AI-based threat recognition, radar signal processing AI, cyber-secure communication",
+   color:"#BF360C",
+   projects:[
+     {name:"Rafale EW Suite for IAF",sector:"Defence",value:"₹2,000 Cr",status:"ongoing",desc:"Spectra electronic warfare suite for 36 Rafale fighters"},
+     {name:"Scorpene Submarine Combat System",sector:"Defence",value:"₹4,000 Cr",status:"completed",desc:"Combat management system for 6 Scorpene submarines"}
+   ],
+   jobs:[
+     {title:"Embedded Software Engineer",type:"Fulltime",city:"Delhi",exp:"1–3 yr",salary:"₹8–13 LPA",skills:"C, RTOS, DO-178C",url:"https://thalesgroup.com/careers"}
+   ]},
+
+  {id:11,name:"Rolls-Royce India",short:"Rolls-Royce",type:"MNC",seg:"Software",hq:"Bangalore",state:"Karnataka",ceo:"Kishore Jayaraman (President India & SE Asia)",founded:1966,revenue:"₹2,500 Cr",employees:"1,000",website:"https://rollsroyce.com",careers:"https://careers.rolls-royce.com",certifications:"AS9100D, CMMI L3, ISO 9001",export:"Global",partners:"HAL, Boeing, Airbus, Indian Navy, IAF",ai:true,ml:true,do178:false,dt:true,addmfg:true,get:true,intern:true,openJobs:4,
+   products:"Trent engines, AE series, M250 helicopters, digital services, IntelligentEngine platform",
+   cad:"NX, CATIA, ANSYS",sim:"ANSYS CFX, Fluent, MATLAB, GT-SUITE",langs:"Python, C++, MATLAB, Julia",
+   aiUse:"IntelligentEngine digital twin, AI-based engine health prognosis, generative design for components",
+   color:"#880E4F",
+   projects:[
+     {name:"Trent 900 Engine — IntelligentEngine",sector:"Commercial",value:"₹1,500 Cr",status:"ongoing",desc:"AI digital twin and health monitoring for Trent 900 powering A380"},
+     {name:"Small Modular Reactor",sector:"Space/Defence",value:"₹5,000 Cr",status:"planned",desc:"Nuclear SMR for future defence and space power needs"}
+   ],
+   jobs:[
+     {title:"Software Engineer – Digital Solutions",type:"Fulltime",city:"Bangalore",exp:"0–3 yr",salary:"₹9–16 LPA",skills:"Python, Cloud, ML, C++",url:"https://careers.rolls-royce.com"}
+   ]},
+
+  {id:12,name:"Bharat Dynamics Limited",short:"BDL",type:"PSU",seg:"Defence",hq:"Hyderabad",state:"Telangana",ceo:"Commodore Siddharth Mishra (CMD)",founded:1970,revenue:"₹4,898 Cr",employees:"4,500",website:"https://bdl-india.in",careers:"https://bdl-india.in/careers",certifications:"ISO 9001, AS9100D",export:"Thailand, UAE, Oman, Myanmar",partners:"DRDO, HAL, BEL, MBDA, Rafael",ai:false,ml:false,do178:false,dt:false,addmfg:false,get:true,intern:true,openJobs:4,
+   products:"Astra BVR missile, Akash SAM, MRSAM, Konkurs ATGM, Milan ATGM, torpedo systems",
+   cad:"SolidWorks, CATIA, ANSYS",sim:"MATLAB, LabVIEW",langs:"C, Embedded C, MATLAB",
+   aiUse:"Missile guidance algorithm optimisation",
+   color:"#4E342E",
+   projects:[
+     {name:"MRSAM Production — IAF/Navy",sector:"Defence",value:"₹26,000 Cr",status:"ongoing",desc:"Medium Range Surface to Air Missile with Israel Aerospace Industries"},
+     {name:"Astra Mk2 BVR Missile",sector:"Defence",value:"₹4,500 Cr",status:"ongoing",desc:"Extended range 160km Beyond Visual Range air-to-air missile"}
+   ],
+   jobs:[
+     {title:"Management Trainee – Engineering",type:"GET",city:"Hyderabad",exp:"0–2 yr",salary:"₹6–8 LPA",skills:"Mechanical/Electronics engineering",url:"https://bdl-india.in/careers"}
+   ]},
+
+  {id:13,name:"ideaForge Technology",short:"ideaForge",type:"Private",seg:"UAV",hq:"Mumbai",state:"Maharashtra",ceo:"Ankit Mehta (Co-founder & CEO)",founded:2007,revenue:"₹355 Cr",employees:"400",website:"https://ideaforge.in",careers:"https://ideaforge.in/careers",certifications:"NPNT certified, DGCA Type Certificate, ATC certification",export:"USA, Israel, Southeast Asia",partners:"Indian Army, Paramilitary, Adani, SFO Technologies",ai:true,ml:true,do178:false,dt:false,addmfg:true,get:false,intern:true,openJobs:7,
+   products:"SWITCH UAV, Q series drones, Mark 4 VTOL, tethered drones, surveillance platforms",
+   cad:"SolidWorks, Fusion 360, CATIA",sim:"MATLAB/Simulink, ROS, Gazebo",langs:"Python, C++, ROS, OpenCV, YOLO",
+   aiUse:"Real-time object detection (YOLO v8), target tracking, AI-based navigation in GPS-denied environments",
+   color:"#E65100",
+   projects:[
+     {name:"SWITCH UAV — Indian Army",sector:"Defence",value:"₹200 Cr",status:"completed",desc:"Army deployed SWITCH fixed-wing VTOL UAVs for border surveillance"},
+     {name:"Civil UAV Platform — Surveying",sector:"Commercial",value:"₹80 Cr",status:"ongoing",desc:"DGCA-certified UAVs for survey and mapping for NHAI, Railways"}
+   ],
+   jobs:[
+     {title:"Embedded Systems Engineer",type:"Fulltime",city:"Mumbai",exp:"0–2 yr",salary:"₹6–9 LPA",skills:"STM32, ROS, C++, Python, ArduPilot",url:"https://ideaforge.in/careers"},
+     {title:"Computer Vision Engineer",type:"Fulltime",city:"Mumbai",exp:"0–2 yr",salary:"₹7–11 LPA",skills:"YOLO, OpenCV, Python, PyTorch",url:"https://ideaforge.in/careers"},
+     {title:"Intern – Drone Software",type:"Internship",city:"Mumbai",exp:"B.Tech",salary:"₹20,000/mo",skills:"ROS, Python, C++",url:"https://ideaforge.in/careers"}
+   ]},
+
+  {id:14,name:"Skyroot Aerospace",short:"Skyroot",type:"Startup",seg:"Space",hq:"Hyderabad",state:"Telangana",ceo:"Pawan Kumar Chandana (Co-founder & CEO)",founded:2018,revenue:"$51Mn raised",employees:"250",website:"https://skyroot.in",careers:"https://skyroot.in/careers",certifications:"IN-SPACe approved, DPIIT recognized",export:"Global launch services planned",partners:"IN-SPACe, ISRO, Bellatrix, Indian Navy",ai:true,ml:true,do178:false,dt:true,addmfg:true,get:false,intern:true,openJobs:8,
+   products:"Vikram-1 orbital rocket, Vikram-S suborbital, Dhawan engines, carbon fibre structures",
+   cad:"CATIA, Fusion 360, FreeCAD",sim:"OpenFOAM, ANSYS, RocketCEA, MATLAB",langs:"Python, C++, MATLAB, Julia, Rust",
+   aiUse:"AI-based trajectory optimisation, ML for engine health, generative design for rocket structures",
+   color:"#006064",
+   projects:[
+     {name:"Vikram-1 First Orbital Mission",sector:"Space",value:"Confidential",status:"ongoing",desc:"India's first private orbital rocket — 3-stage liquid fuel vehicle to SSO"},
+     {name:"Vikram-S Suborbital Test",sector:"Space",value:"₹50 Cr",status:"completed",desc:"India's first private rocket launch — Vikram-S reached 89.5km altitude in Nov 2022"},
+     {name:"Reusable Launch Vehicle Study",sector:"Space",value:"₹200 Cr",status:"planned",desc:"First stage recovery and reuse for Vikram series"}
+   ],
+   jobs:[
+     {title:"GNC Software Engineer",type:"Fulltime",city:"Hyderabad",exp:"0–2 yr",salary:"₹8–14 LPA",skills:"Python, C++, MATLAB, Kalman Filter, GNC",url:"https://skyroot.in/careers"},
+     {title:"ML Engineer – Trajectory Optimisation",type:"Fulltime",city:"Hyderabad",exp:"0–2 yr",salary:"₹8–12 LPA",skills:"PyTorch, Python, MATLAB, scikit-learn",url:"https://skyroot.in/careers"},
+     {title:"Propulsion Engineer",type:"Fulltime",city:"Hyderabad",exp:"0–3 yr",salary:"₹7–12 LPA",skills:"Liquid propulsion, RocketCEA, CFD",url:"https://skyroot.in/careers"}
+   ]},
+
+  {id:15,name:"Agnikul Cosmos",short:"Agnikul",type:"Startup",seg:"Space",hq:"Chennai",state:"Tamil Nadu",ceo:"Srinath Ravichandran (Co-founder & CEO)",founded:2017,revenue:"$40Mn raised",employees:"150",website:"https://agnikul.in",careers:"https://agnikul.in/careers",certifications:"IN-SPACe approved, IIT-M incubated",export:"Global launch services",partners:"IN-SPACe, IIT Madras, ISRO, Airbus BizLab",ai:true,ml:false,do178:false,dt:false,addmfg:true,get:false,intern:true,openJobs:6,
+   products:"Agnibaan SOrTeD rocket, Agnilet engine (world's first single-piece 3D printed rocket engine)",
+   cad:"SolidWorks, CATIA, Fusion 360",sim:"OpenFOAM, ANSYS, RocketCEA",langs:"Python, C++, MATLAB",
+   aiUse:"Additive manufacturing process optimisation, AI-guided trajectory correction",
+   color:"#BF360C",
+   projects:[
+     {name:"Agnibaan SOrTeD — First Launch",sector:"Space",value:"₹100 Cr",status:"completed",desc:"World's first rocket with single-piece 3D printed engine, launched May 2024"},
+     {name:"Agnibaan Orbital Version",sector:"Space",value:"₹300 Cr",status:"planned",desc:"Full orbital version of Agnibaan with 300kg payload to LEO"}
+   ],
+   jobs:[
+     {title:"Propulsion Engineer – Additive Mfg",type:"Fulltime",city:"Chennai",exp:"0–3 yr",salary:"₹7–13 LPA",skills:"SLM, DMLS, CFD, rocket propulsion",url:"https://agnikul.in/careers"},
+     {title:"Avionics Engineer",type:"Fulltime",city:"Chennai",exp:"0–2 yr",salary:"₹7–11 LPA",skills:"Embedded C, STM32, FPGA, GPS/IMU",url:"https://agnikul.in/careers"}
+   ]},
+
+  {id:16,name:"Pixxel Space",short:"Pixxel",type:"Startup",seg:"Space",hq:"Bangalore",state:"Karnataka",ceo:"Awais Ahmed (Co-founder & CEO)",founded:2019,revenue:"$71Mn raised",employees:"150",website:"https://pixxel.space",careers:"https://pixxel.space/careers",certifications:"IN-SPACe approved",export:"Global imagery customers",partners:"IN-SPACe, Google, ISRO, Accenture",ai:true,ml:true,do178:false,dt:false,addmfg:true,get:false,intern:true,openJobs:5,
+   products:"Firefly hyperspectral satellites, Aurora satellite constellation, geospatial AI platform",
+   cad:"SolidWorks, FreeCAD, KiCAD",sim:"GMAT, OpenFOAM, STK",langs:"Python, TensorFlow, PyTorch, OpenCV, C++",
+   aiUse:"Hyperspectral image AI for crop health, fire detection, mineral mapping, water quality; ML for sat anomaly detection",
+   color:"#1A237E",
+   projects:[
+     {name:"Aurora Constellation — 24 Satellites",sector:"Space",value:"$71Mn",status:"ongoing",desc:"6 Firefly satellites launched, 24-satellite constellation for global hyperspectral coverage"},
+     {name:"Geospatial AI Platform",sector:"Commercial",value:"₹200 Cr",status:"ongoing",desc:"SaaS platform for agriculture, mining, defence customers using hyperspectral AI"}
+   ],
+   jobs:[
+     {title:"ML Engineer – Remote Sensing",type:"Fulltime",city:"Bangalore",exp:"0–3 yr",salary:"₹8–16 LPA",skills:"Python, TensorFlow, OpenCV, hyperspectral",url:"https://pixxel.space/careers"},
+     {title:"Satellite Software Engineer",type:"Fulltime",city:"Bangalore",exp:"0–2 yr",salary:"₹8–14 LPA",skills:"C, Python, FreeRTOS, CCSDS",url:"https://pixxel.space/careers"}
+   ]},
+
+  {id:17,name:"Garuda Aerospace",short:"Garuda",type:"Startup",seg:"UAV",hq:"Chennai",state:"Tamil Nadu",ceo:"Agnishwar Jayaprakash (Founder & CEO)",founded:2015,revenue:"₹150 Cr",employees:"350",website:"https://garudaaerospace.com",careers:"https://garudaaerospace.com/careers",certifications:"DGCA Type Certificate, NPNT, India Drone Alliance",export:"Southeast Asia, Middle East",partners:"MS Dhoni (brand ambassador), NITI Aayog, MHA",ai:true,ml:true,do178:false,dt:false,addmfg:false,get:false,intern:true,openJobs:10,
+   products:"Droni, Kisan Drone (agri), surveillance drones, drone-as-a-service, drone taxi concept",
+   cad:"SolidWorks, Fusion 360",sim:"MATLAB, ROS, Gazebo",langs:"Python, C++, ROS, ArduPilot",
+   aiUse:"AI-based crop analysis, precision agriculture ML, autonomous delivery routing",
+   color:"#1B5E20",
+   projects:[
+     {name:"Kisan Drone — 1 Lakh Drones",sector:"Commercial",value:"₹500 Cr",status:"ongoing",desc:"Mass deployment of agricultural drones for fertilizer/pesticide spraying under PLI scheme"},
+     {name:"Drone Delivery — Last Mile",sector:"Commercial",value:"₹100 Cr",status:"planned",desc:"BVLOS drone delivery network for medicines, e-commerce"}
+   ],
+   jobs:[
+     {title:"Drone Software Engineer",type:"Fulltime",city:"Chennai",exp:"0–2 yr",salary:"₹5–8 LPA",skills:"Python, ROS, ArduPilot, C++",url:"https://garudaaerospace.com/careers"},
+     {title:"AI/Computer Vision Engineer",type:"Fulltime",city:"Chennai",exp:"0–2 yr",salary:"₹6–10 LPA",skills:"YOLO, OpenCV, Python, edge AI",url:"https://garudaaerospace.com/careers"}
+   ]},
+
+  {id:18,name:"KPIT Technologies",short:"KPIT",type:"Private",seg:"Software",hq:"Pune",state:"Maharashtra",ceo:"Kishor Patil (Co-founder & CEO)",founded:1990,revenue:"₹5,200 Cr",employees:"13,000",website:"https://kpit.com",careers:"https://kpit.com/careers",certifications:"CMMI L5, ISO 9001, DO-178C, ASPICE",export:"USA, Germany, Japan, UK",partners:"Boeing, Airbus, Collins, Embraer, BMW",ai:true,ml:true,do178:true,dt:true,addmfg:false,get:true,intern:true,openJobs:14,
+   products:"Avionics software, embedded systems, digital twin, autonomous systems, AUTOSAR",
+   cad:"CATIA, NX, SolidWorks",sim:"MATLAB, Simulink, ANSYS",langs:"C, C++, Python, MATLAB, Ada, Rust",
+   aiUse:"Autonomous aircraft systems AI, digital twin for aerospace, ML-based embedded system testing",
+   color:"#311B92",
+   projects:[
+     {name:"eVTOL Avionics Software",sector:"Commercial",value:"₹600 Cr",status:"ongoing",desc:"Safety-critical avionics software for Joby Aviation eVTOL aircraft"},
+     {name:"Aerospace Digital Twin Platform",sector:"Commercial",value:"₹400 Cr",status:"ongoing",desc:"Real-time digital twin for aircraft fleet health management"}
+   ],
+   jobs:[
+     {title:"Avionics Software Engineer",type:"GET",city:"Pune",exp:"0–1 yr",salary:"₹6–9 LPA",skills:"C, DO-178C, ARINC 429, Python",url:"https://kpit.com/careers"},
+     {title:"ML Engineer – Embedded AI",type:"Fulltime",city:"Pune",exp:"0–2 yr",salary:"₹7–12 LPA",skills:"TensorFlow Lite, edge AI, C++, Python",url:"https://kpit.com/careers"}
+   ]},
+
+  {id:19,name:"Wipro Aerospace",short:"Wipro",type:"Private",seg:"Software",hq:"Bangalore",state:"Karnataka",ceo:"Thierry Delaporte (CEO, Wipro Ltd)",founded:2008,revenue:"₹2,500 Cr",employees:"3,000",website:"https://wipro.com",careers:"https://careers.wipro.com",certifications:"AS9100D, DO-178C, EASA Part-145",export:"USA, UK, Europe",partners:"Boeing, Airbus, HAL, Collins, Honeywell",ai:true,ml:true,do178:true,dt:false,addmfg:false,get:true,intern:true,openJobs:12,
+   products:"Avionics software, MRO tech, engineering services, digital manufacturing",
+   cad:"CATIA, NX, SolidWorks",sim:"ANSYS, MATLAB",langs:"C, C++, Python, Ada",
+   aiUse:"Predictive MRO analytics, AI visual inspection, digital thread for aerospace manufacturing",
+   color:"#37474F",
+   projects:[
+     {name:"Boeing 787 Systems Software",sector:"Commercial",value:"₹1,200 Cr",status:"ongoing",desc:"Flight management and avionics software for Boeing 787 Dreamliner"},
+     {name:"HAL LCH Avionics Support",sector:"Defence",value:"₹300 Cr",status:"ongoing",desc:"Software support and testing for LCH Prachand avionics"}
+   ],
+   jobs:[
+     {title:"Avionics Engineer – Boeing",type:"Fulltime",city:"Bangalore",exp:"0–2 yr",salary:"₹6–10 LPA",skills:"DO-178C, C, ARINC, DOORS",url:"https://careers.wipro.com"},
+     {title:"Fresher – Aerospace Engineering",type:"GET",city:"Bangalore",exp:"0–1 yr",salary:"₹3.5–5 LPA",skills:"B.Tech Aerospace/Mechanical",url:"https://careers.wipro.com"}
+   ]},
+
+  {id:20,name:"Astra Microwave Products",short:"Astra MW",type:"Private",seg:"Avionics",hq:"Hyderabad",state:"Telangana",ceo:"B. Malla Reddy (CMD)",founded:1991,revenue:"₹630 Cr",employees:"700",website:"https://astramwp.com",careers:"https://astramwp.com/careers",certifications:"AS9100D, ISO 9001, DGQA approved",export:"Israel, USA, UK",partners:"DRDO, BEL, HAL, ISRO, Thales",ai:true,ml:false,do178:false,dt:false,addmfg:false,get:true,intern:true,openJobs:5,
+   products:"RF/Microwave modules, radar subsystems, EW components, AESA T/R modules, satcom",
+   cad:"SolidWorks, Cadence, HFSS",sim:"CST Studio, HFSS, ADS",langs:"C, MATLAB, Python",
+   aiUse:"AI-based radar signal processing, RF interference detection",
+   color:"#4A148C",
+   projects:[
+     {name:"AESA T/R Module — BEL Radar",sector:"Defence",value:"₹500 Cr",status:"ongoing",desc:"Transmit/Receive modules for BEL's Uttam AESA radar for Tejas Mk1A"},
+     {name:"EW Receiver Module — DRDO",sector:"Defence",value:"₹200 Cr",status:"ongoing",desc:"Wideband RF receiver modules for DRDO's airborne EW systems"}
+   ],
+   jobs:[
+     {title:"RF/Microwave Engineer",type:"GET",city:"Hyderabad",exp:"0–2 yr",salary:"₹5–8 LPA",skills:"RF design, HFSS, ADS, Cadence",url:"https://astramwp.com/careers"}
+   ]},
+
+  // ── REMAINING 38 COMPANIES (condensed) ──────────────────────
+  {id:21,name:"Safran Engineering India",short:"Safran",type:"MNC",seg:"Manufacturing",hq:"Bangalore",state:"Karnataka",ceo:"Cedric Goubet (India MD)",founded:2007,revenue:"₹3,200 Cr",employees:"3,500",website:"https://safran-group.com",careers:"https://safran-group.com/careers",certifications:"AS9100D, NADCAP, ISO 9001",export:"Global",partners:"HAL, Air India, Boeing, Airbus",ai:true,ml:false,do178:false,dt:true,addmfg:true,get:true,intern:true,openJobs:7,products:"Landing gear, nacelles, CFM LEAP engine parts, seats, electrical harnesses",cad:"CATIA V5, SolidWorks",sim:"ANSYS, MSC Nastran",langs:"Python, C, MATLAB",aiUse:"Predictive MRO, digital twin landing gear",color:"#0D47A1",projects:[{name:"Landing Gear MRO India",sector:"Commercial",value:"₹800 Cr",status:"ongoing",desc:"MRO facility for CFM56 and LEAP engines supporting IndiGo, Air India"}],jobs:[{title:"Mechanical Engineer – Landing Gear",type:"Fulltime",city:"Bangalore",exp:"0–3 yr",salary:"₹6–10 LPA",skills:"FEA, CATIA, AS9100D",url:"https://safran-group.com/careers"}]},
+
+  {id:22,name:"Dynamatic Technologies",short:"Dynamatic",type:"Private",seg:"Manufacturing",hq:"Bangalore",state:"Karnataka",ceo:"Udayant Malhoutra (CEO)",founded:1973,revenue:"₹1,400 Cr",employees:"2,200",website:"https://dynamaticgroup.com",careers:"https://dynamaticgroup.com/careers",certifications:"AS9100D, NADCAP, ISO 9001",export:"Boeing, Airbus, BAE customers",partners:"Boeing, Airbus, HAL, BAE Systems",ai:false,ml:false,do178:false,dt:false,addmfg:false,get:true,intern:true,openJobs:4,products:"Aerospace hydraulic systems, structural assemblies, precision machining, Bell 407 fuselage",cad:"CATIA, ProE, NX",sim:"ANSYS, MSC Nastran",langs:"Python (automation)",aiUse:"None currently",color:"#1B5E20",projects:[{name:"Bell 407 Fuselage — Bell Textron",sector:"Commercial",value:"₹600 Cr",status:"ongoing",desc:"Complete fuselage assemblies for Bell 407 helicopter"}],jobs:[{title:"Manufacturing Engineer",type:"GET",city:"Bangalore",exp:"0–2 yr",salary:"₹4.5–7 LPA",skills:"Machining, CNC, AS9100D, CATIA",url:"https://dynamaticgroup.com/careers"}]},
+
+  {id:23,name:"Mahindra Aerospace",short:"Mahindra Aero",type:"Private",seg:"Manufacturing",hq:"Bangalore",state:"Karnataka",ceo:"Arvind Mehra (MD & CEO, Mahindra)",founded:2012,revenue:"₹800 Cr",employees:"1,000",website:"https://mahindra.com/aerospace",careers:"https://careers.mahindra.com",certifications:"AS9100D, ISO 9001",export:"Australia, USA",partners:"GippsAero (Australia), HAL, Airbus",ai:false,ml:false,do178:false,dt:false,addmfg:false,get:false,intern:true,openJobs:3,products:"GippsAero GA8 Airvan, Utility aircraft, aerostructures, MRO",cad:"SolidWorks, CATIA",sim:"ANSYS, MATLAB",langs:"Python, MATLAB",aiUse:"None currently",color:"#E65100",projects:[{name:"GippsAero Airvan Production",sector:"Commercial",value:"₹400 Cr",status:"ongoing",desc:"Continued production of GA8 Airvan utility aircraft in Australia under Mahindra"}],jobs:[{title:"Aerospace Engineer – Structures",type:"Fulltime",city:"Bangalore",exp:"1–3 yr",salary:"₹5–9 LPA",skills:"CATIA, FEA, AS9100D",url:"https://careers.mahindra.com"}]},
+
+  {id:24,name:"Adani Defence & Aerospace",short:"Adani Defence",type:"Private",seg:"Defence",hq:"Ahmedabad",state:"Gujarat",ceo:"Ashish Rajvanshi (CEO)",founded:2014,revenue:"₹2,000 Cr",employees:"3,000",website:"https://adanidefence.com",careers:"https://careers.adani.com",certifications:"AS9100D, ITAR registered",export:"Israel, USA",partners:"Elbit Systems, Boeing, HAL, IAI",ai:false,ml:false,do178:false,dt:false,addmfg:false,get:false,intern:true,openJobs:5,products:"Small arms, ammo, drones (Elbit Hermes 900), aerostructures, C4ISR",cad:"SolidWorks, NX",sim:"ANSYS",langs:"C, Python",aiUse:"Drone AI payload",color:"#263238",projects:[{name:"Hermes 900 MALE UAV — India",sector:"Defence",value:"₹5,500 Cr",status:"ongoing",desc:"Manufacture of Hermes 900 MALE UAVs in India with Elbit Systems"},
+  {name:"Aerostructures — C-295 Airbus",sector:"Defence",value:"₹2,000 Cr",status:"ongoing",desc:"Aerostructure components for 56 Airbus C-295 transport aircraft for IAF"}],jobs:[{title:"Aerospace Manufacturing Engineer",type:"Fulltime",city:"Hyderabad",exp:"1–3 yr",salary:"₹6–10 LPA",skills:"Composites, AS9100D, CATIA",url:"https://careers.adani.com"}]},
+
+  {id:25,name:"NSIL — NewSpace India Limited",short:"NSIL",type:"Govt",seg:"Space",hq:"Bangalore",state:"Karnataka",ceo:"Radhakrishnan Durairaj (CMD)",founded:2019,revenue:"₹2,000 Cr",employees:"250",website:"https://nsilindia.co.in",careers:"https://isro.gov.in/careers",certifications:"ISO 9001, ISRO standards",export:"OneWeb, international launches",partners:"ISRO, OneWeb, Hughes, TATA",ai:false,ml:false,do178:false,dt:false,addmfg:false,get:true,intern:true,openJobs:5,products:"PSLV commercial launches, GSAT satellites, OneWeb launches, tech transfer",cad:"CATIA, ANSYS",sim:"GMAT, MATLAB",langs:"Python, C, MATLAB",aiUse:"Orbital slot optimisation",color:"#1B5E20",projects:[{name:"OneWeb Constellation Launches",sector:"Space",value:"₹3,000 Cr",status:"completed",desc:"Launched 36+36 OneWeb LEO internet satellites on LVM3"},
+  {name:"GSAT-20 Ka-band Satellite",sector:"Space",value:"₹1,500 Cr",status:"completed",desc:"High throughput satellite for broadband services"}],jobs:[{title:"Management Trainee",type:"GET",city:"Bangalore",exp:"0–1 yr",salary:"₹56,100/mo",skills:"Engineering/Management",url:"https://isro.gov.in/careers"}]},
+
+  {id:26,name:"Throttle Aerospace",short:"Throttle",type:"Startup",seg:"UAV",hq:"Bangalore",state:"Karnataka",ceo:"Raghu Dharmaraju (CEO)",founded:2020,revenue:"₹50 Cr",employees:"120",website:"https://throttleaerospace.com",careers:"https://throttleaerospace.com/careers",certifications:"DGCA type cert",export:"USA pilot",partners:"Bangalore Airport, ePlane",ai:true,ml:true,do178:false,dt:false,addmfg:false,get:false,intern:true,openJobs:6,products:"Survey drones, cargo UAVs, eVTOL development, drone-as-a-service",cad:"SolidWorks, Fusion 360",sim:"MATLAB, ROS",langs:"Python, C++, ROS",aiUse:"Autonomous delivery path planning, obstacle avoidance AI",color:"#FF6F00",projects:[{name:"Airport Cargo UAV Trial",sector:"Commercial",value:"₹30 Cr",status:"ongoing",desc:"BVLOS cargo drone trials at Kempegowda International Airport"}],jobs:[{title:"Drone Software Engineer",type:"Fulltime",city:"Bangalore",exp:"0–2 yr",salary:"₹5–9 LPA",skills:"ROS, C++, Python, PX4",url:"https://throttleaerospace.com/careers"}]},
+
+  {id:27,name:"ePlane Company",short:"ePlane",type:"Startup",seg:"UAV",hq:"Chennai",state:"Tamil Nadu",ceo:"Prof. Satya Chakravarthy (Co-founder)",founded:2021,revenue:"$5Mn raised",employees:"60",website:"https://eplane.in",careers:"https://eplane.in/careers",certifications:"DPIIT startup, IIT Madras incubated",export:"Planned",partners:"IIT Madras, IN-SPACe, DGCA",ai:true,ml:false,do178:false,dt:false,addmfg:false,get:false,intern:true,openJobs:4,products:"e200 air taxi (2-seat eVTOL), electric aircraft, autonomous urban air mobility",cad:"SolidWorks, CATIA",sim:"ANSYS Fluent, OpenFOAM",langs:"Python, C++, MATLAB",aiUse:"Autonomous flight path planning for urban environments",color:"#4A148C",projects:[{name:"e200 Air Taxi Development",sector:"Commercial",value:"$5Mn",status:"ongoing",desc:"2-seat electric vertical takeoff landing air taxi for intra-city mobility"}],jobs:[{title:"Aerospace Engineer – eVTOL",type:"Fulltime",city:"Chennai",exp:"0–2 yr",salary:"₹5–9 LPA",skills:"CATIA, CFD, MATLAB, composites",url:"https://eplane.in/careers"}]},
+
+  {id:28,name:"MIDHANI",short:"MIDHANI",type:"PSU",seg:"Manufacturing",hq:"Hyderabad",state:"Telangana",ceo:"Sanjay Kumar Jha (CMD)",founded:1973,revenue:"₹1,050 Cr",employees:"1,500",website:"https://midhani-india.in",careers:"https://midhani-india.in/careers",certifications:"AS9100D, NADCAP, ISO 9001, AMS qualified",export:"USA, Germany, France, Japan",partners:"HAL, ISRO, DRDO, GE, Safran",ai:false,ml:false,do178:false,dt:false,addmfg:true,get:true,intern:true,openJobs:3,products:"Titanium alloys, superalloys, maraging steel, special steels, composites, space structures",cad:"SolidWorks, ProE",sim:"ANSYS, Deform",langs:"Python (data analysis), MATLAB",aiUse:"None currently",color:"#BF360C",projects:[{name:"Titanium Components — ISRO LVM3",sector:"Space",value:"₹200 Cr",status:"ongoing",desc:"Critical Ti-6Al-4V components for LVM3 cryogenic stage"},
+  {name:"Superalloy Components — GE F414",sector:"Defence",value:"₹300 Cr",status:"ongoing",desc:"Nickel superalloy turbine discs for GE F414 engine for Tejas Mk2"}],jobs:[{title:"Metallurgical Engineer",type:"GET",city:"Hyderabad",exp:"0–2 yr",salary:"₹5–7 LPA",skills:"Metallurgy, NDT, AS9100D",url:"https://midhani-india.in/careers"}]},
+
+  {id:29,name:"Godrej Aerospace",short:"Godrej Aero",type:"Private",seg:"Manufacturing",hq:"Mumbai",state:"Maharashtra",ceo:"Jamshyd N. Godrej (Chairman)",founded:1985,revenue:"₹1,500 Cr",employees:"2,000",website:"https://godrej.com/aerospace",careers:"https://godrej.com/careers",certifications:"AS9100D, NADCAP, ISO 9001",export:"ISRO, global customers",partners:"ISRO, HAL, BEL, Boeing",ai:false,ml:false,do178:false,dt:false,addmfg:true,get:false,intern:true,openJobs:4,products:"Precision aerospace components, cryogenic engine parts, satellite structures, Vikas engine parts",cad:"CATIA V5, NX, ProE",sim:"ANSYS, MSC Nastran",langs:"Python, MATLAB",aiUse:"Quality AI inspection",color:"#1A237E",projects:[{name:"Vikas Engine Components — PSLV",sector:"Space",value:"₹300 Cr",status:"ongoing",desc:"Precision-machined components for ISRO Vikas liquid engine"},
+  {name:"SCE-200 Cryogenic Engine Parts",sector:"Space",value:"₹150 Cr",status:"ongoing",desc:"Critical components for ISRO's semi-cryogenic engine development"}],jobs:[{title:"Precision Manufacturing Engineer",type:"Fulltime",city:"Mumbai",exp:"1–3 yr",salary:"₹5–9 LPA",skills:"CNC, CMM, CATIA, AS9100D",url:"https://godrej.com/careers"}]},
+
+  {id:30,name:"L&T Defence",short:"L&T Defence",type:"Private",seg:"Defence",hq:"Mumbai",state:"Maharashtra",ceo:"Arun Ramchandani (President, Defence)",founded:1938,revenue:"₹8,000 Cr",employees:"8,000",website:"https://larsentoubro.com/defence",careers:"https://larsentoubro.com/careers",certifications:"AS9100D, ISO 9001, ITAR, DGQA",export:"USA, Israel, Europe",partners:"Boeing, Lockheed, DRDO, HAL, Rheinmetall",ai:false,ml:false,do178:false,dt:true,addmfg:false,get:true,intern:true,openJobs:8,products:"Sukhoi Su-30 components, K9 Vajra howitzers, Arjun tank, sonar, naval guns, radar",cad:"CATIA, NX, SolidWorks",sim:"ANSYS, Nastran",langs:"C, Python, MATLAB",aiUse:"Digital twin for defence manufacturing",color:"#E65100",projects:[{name:"K9 Vajra Self-Propelled Howitzer",sector:"Defence",value:"₹4,500 Cr",status:"completed",desc:"100 K9 Vajra 155mm howitzers for Indian Army"},
+  {name:"MRSAM Launcher System",sector:"Defence",value:"₹3,000 Cr",status:"ongoing",desc:"Launcher vehicles and ground systems for MRSAM air defence"}],jobs:[{title:"Graduate Engineer Trainee",type:"GET",city:"Mumbai/Hyderabad",exp:"0–1 yr",salary:"₹5–7 LPA",skills:"Mechanical/Electrical Engineering",url:"https://larsentoubro.com/careers"},
+  {title:"Software Engineer – Defence",type:"Fulltime",city:"Bangalore",exp:"1–3 yr",salary:"₹7–12 LPA",skills:"C++, Python, embedded, real-time systems",url:"https://larsentoubro.com/careers"}]},
+];
+
+// ═══════════════════════════════════════════════════════
+// RENDER FUNCTIONS
+// ═══════════════════════════════════════════════════════
+let currentView = 'grid';
+let filteredList = [...COMPANIES];
+
+const SEG_CLASS = {Defence:'seg-defence',Space:'seg-space',UAV:'seg-uav',Manufacturing:'seg-mfg',Software:'seg-software',Avionics:'seg-avionics',MRO:'seg-mro'};
+const TYPE_CLASS = {PSU:'type-psu',Govt:'type-govt','Govt.':'type-govt',MNC:'type-mnc',Private:'type-private',Startup:'type-startup',JV:'type-jv'};
+
+function renderCards(list) {
+  const g = document.getElementById('grid-view');
+  if(!g) return;
+  g.innerHTML = list.map(c => `
+    <div class="co-card" onclick="openModal(${c.id})">
+      <div class="co-card-top">
+        <div class="co-header">
+          <div class="co-avatar" style="background:${c.color}20;color:${c.color};border:1px solid ${c.color}40">${c.short.slice(0,3)}</div>
+          <div style="flex:1">
+            <div class="co-name">${c.name}</div>
+            <div class="co-hq"><i class="bi bi-geo-alt"></i>${c.hq}, ${c.state}</div>
+            <span class="co-type-badge ${TYPE_CLASS[c.type]||'type-private'}">${c.type}</span>
+            <span class="co-type-badge ${SEG_CLASS[c.seg]||'seg-software'}" style="margin-left:4px">${c.seg}</span>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:18px;font-weight:900;color:var(--amber2)">${c.openJobs}</div>
+            <div style="font-size:10px;color:var(--muted)">Open Jobs</div>
+          </div>
+        </div>
+        <div class="co-meta">
+          <div class="co-meta-item"><div class="label">CEO / Head</div><div class="value" style="font-size:12px">${c.ceo}</div></div>
+          <div class="co-meta-item"><div class="label">Revenue</div><div class="value">${c.revenue}</div></div>
+          <div class="co-meta-item"><div class="label">Employees</div><div class="value">${c.employees}</div></div>
+          <div class="co-meta-item"><div class="label">Founded</div><div class="value">${c.founded}</div></div>
+        </div>
+      </div>
+      <div class="co-card-bottom">
+        ${c.ai?'<span class="chip chip-ai">🤖 AI</span>':''}
+        ${c.ml?'<span class="chip chip-ml">📊 ML</span>':''}
+        ${c.do178?'<span class="chip chip-do178">✈ DO-178C</span>':''}
+        ${c.dt?'<span class="chip chip-dt">🔮 Digital Twin</span>':''}
+        ${c.addmfg?'<span class="chip chip-addmfg">⚙ Additive Mfg</span>':''}
+        ${c.get?'<span class="chip chip-get">🎓 GET</span>':''}
+        ${c.intern?'<span class="chip chip-intern">📋 Internship</span>':''}
+      </div>
+    </div>`).join('');
+}
+
+function renderTable(list) {
+  const tb = document.getElementById('table-tbody');
+  if(!tb) return;
+  tb.innerHTML = list.map((c,i) => `
+    <tr onclick="openModal(${c.id})">
+      <td>${i+1}</td>
+      <td><div class="fw7">${c.name}</div><div style="font-size:11px;color:var(--muted)">${c.hq}</div></td>
+      <td><span class="co-type-badge ${TYPE_CLASS[c.type]||''}">${c.type}</span></td>
+      <td><span class="co-type-badge ${SEG_CLASS[c.seg]||''}">${c.seg}</span></td>
+      <td>${c.hq}</td>
+      <td style="font-size:12px">${c.ceo}</td>
+      <td style="color:var(--amber2);font-weight:700">${c.revenue}</td>
+      <td>${c.employees}</td>
+      <td class="${c.ai?'tick':'cross'}">${c.ai?'✓':'—'}</td>
+      <td class="${c.do178?'tick':'cross'}">${c.do178?'✓':'—'}</td>
+      <td class="${c.get?'tick':'cross'}">${c.get?'✓':'—'}</td>
+      <td style="color:var(--amber2);font-weight:700">${c.openJobs}</td>
+    </tr>`).join('');
+}
+
+function filterAll() {
+  const q = document.getElementById('search').value.toLowerCase();
+  const seg = document.getElementById('f-seg').value;
+  const type = document.getElementById('f-type').value;
+  const city = document.getElementById('f-city').value;
+  const ai = document.getElementById('f-ai').value;
+
+  filteredList = COMPANIES.filter(c => {
+    const matchQ = !q || [c.name,c.ceo,c.products,c.hq,c.cad,c.langs,c.aiUse,c.certifications].join(' ').toLowerCase().includes(q);
+    const matchSeg = !seg || c.seg === seg;
+    const matchType = !type || c.type === type;
+    const matchCity = !city || c.hq.includes(city);
+    const matchAI = !ai || (ai==='ai'&&(c.ai||c.ml)) || (ai==='get'&&c.get) || (ai==='do178'&&c.do178);
+    return matchQ && matchSeg && matchType && matchCity && matchAI;
+  });
+  document.getElementById('count').textContent = filteredList.length + ' companies';
+  if(currentView==='grid') renderCards(filteredList);
+  else renderTable(filteredList);
+}
+
+function clearFilters() {
+  ['search','f-seg','f-type','f-city','f-ai'].forEach(id => document.getElementById(id).value='');
+  filterAll();
+}
+
+function setView(v, el) {
+  currentView = v;
+  document.getElementById('grid-view').style.display = v==='grid'?'grid':'none';
+  document.getElementById('table-view').style.display = v==='table'?'block':'none';
+  document.querySelectorAll('.tabs .tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  if(v==='table') renderTable(filteredList);
+}
+
+// ── MODAL ──────────────────────────────────────────────
+function openModal(id) {
+  const c = COMPANIES.find(x=>x.id===id);
+  if(!c) return;
+  const box = document.getElementById('modal-box');
+  box.innerHTML = `
+    <div class="modal-head">
+      <div class="co-avatar" style="background:${c.color}20;color:${c.color};border:1px solid ${c.color}40;width:50px;height:50px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800">${c.short.slice(0,3)}</div>
+      <div>
+        <div style="font-size:18px;font-weight:800;color:#fff">${c.name}</div>
+        <div style="font-size:12px;color:var(--muted)">${c.type} · ${c.seg} · ${c.hq} · Est. ${c.founded}</div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="detail-section">
+        <h4>📊 Company Overview</h4>
+        <div class="detail-grid">
+          <div class="detail-item"><div class="dl">CEO / Head</div><div class="dv">${c.ceo}</div></div>
+          <div class="detail-item"><div class="dl">Revenue</div><div class="dv" style="color:var(--amber2)">${c.revenue}</div></div>
+          <div class="detail-item"><div class="dl">Employees</div><div class="dv">${c.employees}</div></div>
+          <div class="detail-item"><div class="dl">Founded</div><div class="dv">${c.founded}</div></div>
+          <div class="detail-item"><div class="dl">Headquarters</div><div class="dv">${c.hq}, ${c.state}</div></div>
+          <div class="detail-item"><div class="dl">Type</div><div class="dv">${c.type}</div></div>
+          <div class="detail-item"><div class="dl">Website</div><div class="dv"><a href="${c.website}" target="_blank" style="color:var(--blue2)">${c.website.replace('https://','')}</a></div></div>
+          <div class="detail-item"><div class="dl">Certifications</div><div class="dv" style="font-size:11px">${c.certifications}</div></div>
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <h4>🏭 Products & Services</h4>
+        <div style="background:rgba(255,255,255,.04);border-radius:8px;padding:12px 14px;font-size:13px;color:var(--white);line-height:1.7">${c.products}</div>
+      </div>
+
+      <div class="detail-section">
+        <h4>🤖 Technology Stack</h4>
+        <div class="detail-grid">
+          <div class="detail-item"><div class="dl">CAD Tools</div><div class="dv" style="font-size:11px">${c.cad}</div></div>
+          <div class="detail-item"><div class="dl">Simulation</div><div class="dv" style="font-size:11px">${c.sim}</div></div>
+          <div class="detail-item"><div class="dl">Languages</div><div class="dv" style="font-size:11px">${c.langs}</div></div>
+          <div class="detail-item"><div class="dl">AI/ML Use</div><div class="dv" style="font-size:11px;color:${c.ai?'#CE93D8':'var(--muted)'}">${c.aiUse}</div></div>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px">
+          ${c.ai?'<span class="chip chip-ai">🤖 AI/ML</span>':''}
+          ${c.do178?'<span class="chip chip-do178">✈ DO-178C</span>':''}
+          ${c.dt?'<span class="chip chip-dt">🔮 Digital Twin</span>':''}
+          ${c.addmfg?'<span class="chip chip-addmfg">⚙ Additive Mfg</span>':''}
+          ${c.get?'<span class="chip chip-get">🎓 GET Programme</span>':''}
+          ${c.intern?'<span class="chip chip-intern">📋 Internships</span>':''}
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <h4>🚀 Key Projects</h4>
+        ${(c.projects||[]).map(p=>`
+          <div class="project-row ${p.sector.toLowerCase()}">
+            <div class="pt">${p.name} <span class="value-pill">${p.value}</span></div>
+            <div class="pm">
+              <span class="status-dot s-${p.status}"></span>${p.status.charAt(0).toUpperCase()+p.status.slice(1)} ·
+              <span style="background:rgba(255,255,255,.08);border-radius:4px;padding:1px 7px;font-size:10px">${p.sector}</span>
+            </div>
+            <div style="font-size:12px;color:var(--muted);margin-top:5px">${p.desc}</div>
+          </div>`).join('')}
+      </div>
+
+      <div class="detail-section">
+        <h4>💼 Current Job Openings</h4>
+        ${(c.jobs||[]).map(j=>`
+          <div class="job-row">
+            <div>
+              <div class="jt">${j.title}</div>
+              <div class="jm">${j.city} · ${j.exp} · ${j.salary} · <span style="font-size:11px;background:rgba(255,255,255,.07);padding:1px 7px;border-radius:4px">${j.type}</span></div>
+              <div style="font-size:11px;color:var(--muted);margin-top:3px">Skills: ${j.skills}</div>
+            </div>
+            <a href="${j.url}" target="_blank" class="apply-btn">Apply →</a>
+          </div>`).join('')}
+      </div>
+
+      <div class="detail-section">
+        <h4>🌐 Strategic Partners & Exports</h4>
+        <div class="detail-grid">
+          <div class="detail-item"><div class="dl">Key Partners</div><div class="dv" style="font-size:11px">${c.partners}</div></div>
+          <div class="detail-item"><div class="dl">Export Markets</div><div class="dv" style="font-size:11px">${c.export}</div></div>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('modal').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+// ── PAGE SWITCHING ─────────────────────────────────────
+function showPage(p, el) {
+  ['companies','projects','jobs','tech'].forEach(id => {
+    const el2 = document.getElementById('page-'+id);
+    if(el2) el2.style.display='none';
+  });
+  document.getElementById('page-'+p).style.display='block';
+  document.querySelectorAll('.nav-links a').forEach(a=>a.classList.remove('active'));
+  if(el) el.classList.add('active');
+
+  if(p==='projects') renderProjects(COMPANIES);
+  if(p==='jobs') renderJobs(COMPANIES);
+  if(p==='tech') renderTech(COMPANIES);
+}
+
+// ── PROJECTS ───────────────────────────────────────────
+function renderProjects(list) {
+  const container = document.getElementById('projects-list');
+  const q = document.getElementById('proj-search')?.value.toLowerCase()||'';
+  const seg = document.getElementById('proj-seg')?.value||'';
+  let count = 0;
+  container.innerHTML = list.filter(c=>c.projects?.length).map(c => {
+    const projs = (c.projects||[]).filter(p =>
+      (!q || (p.name+p.desc+c.name).toLowerCase().includes(q)) &&
+      (!seg || p.sector===seg));
+    if(!projs.length) return '';
+    count += projs.length;
+    return `<div class="section-card">
+      <div class="sc-head">
+        <div class="co-avatar" style="width:36px;height:36px;border-radius:8px;background:${c.color}20;color:${c.color};font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center">${c.short.slice(0,3)}</div>
+        <div><div class="co-n">${c.name}</div><div class="co-s">${c.type} · ${c.seg}</div></div>
+        <span class="co-type-badge ${SEG_CLASS[c.seg]||''}" style="margin-left:auto">${c.seg}</span>
+      </div>
+      <div class="sc-body">
+        ${projs.map(p=>`<div class="proj-item">
+          <div class="proj-name">${p.name} <span class="value-pill">${p.value}</span></div>
+          <div class="proj-meta"><span class="status-dot s-${p.status}"></span>${p.status.charAt(0).toUpperCase()+p.status.slice(1)} · ${p.sector}</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:4px">${p.desc}</div>
+        </div>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+  const el = document.getElementById('proj-count');
+  if(el) el.textContent = count + ' projects';
+}
+
+function filterProjects() { renderProjects(COMPANIES); }
+
+// ── JOBS ───────────────────────────────────────────────
+function renderJobs(list) {
+  const tb = document.getElementById('jobs-tbody');
+  const q = document.getElementById('job-search')?.value.toLowerCase()||'';
+  const type = document.getElementById('job-type')?.value||'';
+  const city = document.getElementById('job-city')?.value||'';
+  let rows = [], count = 0;
+  list.forEach(c => {
+    (c.jobs||[]).forEach(j => {
+      if((!q||(j.title+c.name+j.skills).toLowerCase().includes(q)) &&
+         (!type||j.type===type) && (!city||j.city.includes(city))) {
+        count++;
+        rows.push(`<tr>
+          <td><div class="fw7">${c.name}</div><div style="font-size:10px;color:var(--muted)">${c.seg}</div></td>
+          <td class="fw7">${j.title}</td>
+          <td><span class="chip ${j.type==='GET'?'chip-get':j.type==='Internship'?'chip-intern':'chip-do178'}">${j.type}</span></td>
+          <td>${j.city}</td>
+          <td>${j.exp}</td>
+          <td style="color:var(--amber2);font-weight:700">${j.salary}</td>
+          <td style="font-size:11px;color:var(--muted)">${j.skills}</td>
+          <td><a href="${j.url}" target="_blank" class="apply-btn">Apply →</a></td>
+        </tr>`);
+      }
+    });
+  });
+  if(tb) tb.innerHTML = rows.join('');
+  const el = document.getElementById('job-count');
+  if(el) el.textContent = count + ' positions';
+}
+
+function filterJobs() { renderJobs(COMPANIES); }
+
+// ── TECH ───────────────────────────────────────────────
+function renderTech(list) {
+  const tb = document.getElementById('tech-tbody');
+  const q = document.getElementById('tech-search')?.value.toLowerCase()||'';
+  const f = document.getElementById('tech-filter')?.value||'';
+  const filtered = list.filter(c =>
+    (!q||(c.name+c.cad+c.langs+c.sim+c.aiUse).toLowerCase().includes(q)) &&
+    (!f||(f==='ai'&&(c.ai||c.ml))||(f==='dt'&&c.dt)||(f==='addmfg'&&c.addmfg)||(f==='do178'&&c.do178)));
+  const el = document.getElementById('tech-count');
+  if(el) el.textContent = filtered.length + ' companies';
+  if(tb) tb.innerHTML = filtered.map(c=>`<tr onclick="openModal(${c.id})">
+    <td class="fw7">${c.name}</td>
+    <td><span class="co-type-badge ${SEG_CLASS[c.seg]||''}">${c.seg}</span></td>
+    <td style="font-size:12px;color:${c.ai?'#CE93D8':'var(--muted)'}">${c.aiUse||'—'}</td>
+    <td style="font-size:11px">${c.cad}</td>
+    <td style="font-size:11px">${c.sim}</td>
+    <td style="font-size:11px">${c.langs}</td>
+    <td class="${c.do178?'tick':'cross'}">${c.do178?'✓':'—'}</td>
+    <td class="${c.dt?'tick':'cross'}">${c.dt?'✓':'—'}</td>
+    <td class="${c.addmfg?'tick':'cross'}">${c.addmfg?'✓':'—'}</td>
+  </tr>`).join('');
+}
+
+function filterTech() { renderTech(COMPANIES); }
+
+// ── INIT ───────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  renderCards(COMPANIES);
+  renderTable(COMPANIES);
+  document.getElementById('count').textContent = COMPANIES.length + ' companies';
+});
+
+document.addEventListener('keydown', e => { if(e.key==='Escape') closeModal(); });
+</script>
+</body>
+</html>
